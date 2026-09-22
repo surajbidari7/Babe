@@ -1,322 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Surprise Valentine ❤️</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A Tiny Game For You 💗</title>
 <style>
-body {
-  margin: 0;
-  font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #ff4d6d, #ff9a9e);
-  color: #fff;
-  text-align: center;
-  overflow: hidden;
-}
-
-/* Containers */
-.container { padding: 40px 20px; position: relative; z-index: 2; }
-.hidden { display: none; }
-h1 { font-size: 2.2rem; }
-p { font-size: 1.2rem; }
-button {
-  font-size: 1.2rem;
-  padding: 14px 26px;
-  border-radius: 30px;
-  border: none;
-  cursor: pointer;
-  background: #fff;
-  color: #ff4d6d;
-  font-weight: bold;
-  margin-top: 20px;
-}
-
-/* Basket catcher at bottom */
-#basket {
-  position: fixed;
-  bottom: 20px;
-  width: 120px;
-  height: 40px;
-  background: pink;
-  border-radius: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-}
-
-/* Falling hearts */
-.fall-heart {
-  position: fixed;
-  font-size: 40px;
-  top: -50px;
-  pointer-events: none;
-  z-index: 5;
-}
-
-/* Floating hearts/flowers/balloons */
-.float { position: fixed; bottom: -100px; animation: floatUp linear infinite; pointer-events: none; }
-@keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
-
-/* Valentine No button */
-#noBtn { background: #ff2f55; color: #fff; position: absolute; }
-
-/* Love Box */
-.love-box { background: rgba(255,255,255,0.15); padding: 20px; border-radius: 20px; margin-top: 20px; }
-.gifs img { width: 160px; margin: 10px; border-radius: 16px; }
-
-/* HEART LOADING */
-.big-heart {
-  font-size: 90px;
-  animation: beat 1s infinite;
-  margin: 20px 0;
-}
-@keyframes beat {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-}
-
-/* LOADER BAR */
-.loader {
-  width: 260px;
-  height: 16px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.4);
-  margin: 20px auto;
-  overflow: hidden;
-}
-.loader span {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: #fff;
-  animation: load 3s forwards;
-}
-@keyframes load { to { width: 100%; } }
-
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:linear-gradient(135deg,#fff1f7,#f5efff);color:#33283a;min-height:100vh;display:grid;place-items:center;padding:20px}
+.game{width:min(620px,100%);background:#ffffffdd;border:1px solid #f0ddea;border-radius:28px;padding:28px;box-shadow:0 18px 60px #8d5a7a22;text-align:center}
+h1{margin:4px 0 8px;font-size:30px}.sub{color:#766878;margin-bottom:22px}
+.screen{display:none}.screen.active{display:block}
+.heart{font-size:64px;animation:pulse 1.4s infinite}.emoji{font-size:44px}
+button{border:0;border-radius:16px;padding:13px 18px;font-size:16px;font-weight:700;cursor:pointer;background:#e85d9e;color:white;margin:7px;min-width:130px}
+button.alt{background:#f2e7ef;color:#5d4054}button:focus{outline:3px solid #f5b8d5;outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px auto;max-width:420px}
+.tile{height:92px;background:#fff5fa;border:2px solid #f4d8e6;border-radius:18px;font-size:30px;color:#c45c8e}
+.tile.matched{background:#f8e5ef;border-color:#e8a9c8}
+.message{min-height:28px;font-weight:650;margin:12px}
+.progress{height:8px;background:#f0e4ec;border-radius:99px;overflow:hidden;margin:15px 0}.bar{height:100%;width:0;background:#e85d9e;transition:.3s}
+.small{font-size:13px;color:#8b7887}.love{font-size:21px;line-height:1.55}
+@keyframes pulse{50%{transform:scale(1.1)}} 
 </style>
 </head>
 <body>
+<main class="game">
+  <section id="start" class="screen active">
+    <div class="heart">💗</div>
+    <h1>A tiny game for you</h1>
+    <p class="love">Good morning, beautiful. ☀️❤️<br><br>
+You are so precious to me, and I feel incredibly lucky that I found you.<br>
+I hope today is a little kinder to you and gives you plenty of reasons to smile. 🌷<br><br>
+Now, before you start your day… I made you something tiny. 💕</p>
+    <button onclick="startGame()">Start the smile mission ✨</button>
+  </section>
 
-<!-- Background Music -->
-<audio id="bgMusic" loop>
-  <source src="https://link.ashamaluevmusic.com/dKew
-" type="audio/mpeg">
-</audio>
+  <section id="game" class="screen">
+    <div class="emoji">🌷</div>
+    <h1>Find the matching hearts</h1>
+    <p class="sub">Match all 6 pairs. Take your time — you're not being timed. 💕</p>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="grid" id="grid"></div>
+    <div class="message" id="msg">You got this! 🌸</div>
+  </section>
 
-<!-- Shayari Piano Music -->
-<audio id="shayariMusic" preload="auto">
-  <source src="https://orangefreesounds.com/wp-content/uploads/2025/04/Emotional-romantic-piano-music.mp3" type="audio/mpeg">
-</audio>
-<!-- SCREEN 0: Intro -->
-<div class="container" id="screen0">
-  <h1>Hello Beautiful 🌸</h1>
-  <p>Good morning! 🌞</p>
-  <p>I have a surprise for you,<br>but to proceed, you need to win a game.<br>Are you ready?</p>
-  <button onclick="startGame()">Click to proceed 💖</button>
-</div>
+  <section id="win" class="screen">
+    <div class="heart">🥰</div>
+    <h1>Mission accomplished!</h1>
+    <p class="love">You found all the hearts.<br><br>
+    Official reward: one giant virtual hug 🤗<br>
+    and a reminder that someone is very lucky to have you. ❤️</p>
+    <button onclick="show('secret')">One more thing… 👀</button>
+  </section>
 
-<!-- SCREEN 1: Catch the Pink Heart Game -->
-<div class="container hidden" id="screen1">
-  <h1>Catch the 💖 pink heart! 🎯</h1>
-  <p>Move your mouse to catch the pink heart in the basket.</p>
-  <div id="basket"></div>
-</div>
-
-<!-- SCREEN 2: Win Screen -->
-<div class="container hidden" id="screen2">
-  <h1>Wow, you won! 🎉💖</h1>
-  <p>Surprise is waiting for you…</p>
-  <button onclick="welcomeScreen()">Continue</button>
-</div>
-
-<!-- SCREEN 3: Welcome -->
-<div class="container hidden" id="screen3">
-  <h1>Welcome to Suraj's World 🌍❤️</h1>
-  <button onclick="loadingScreen()">Continue</button>
-</div>
-
-<!-- SCREEN 3.5: Loading Heart -->
-<div class="container hidden" id="screen3_5">
-  <div class="big-heart">❤️</div>
-  <p>Entering my Heart…</p>
-  <div class="loader"><span></span></div>
-</div>
-
-<!-- SCREEN 4: Valentine Question -->
-<div class="container hidden" id="screen4">
-  <h1>Will you be my Valentine? 🌹❤️</h1>
-  <p>Please take your time to think. You can click NO as well 👀</p>
-  <div class="buttons">
-    <button onclick="sayYes()">Yes 💖</button>
-    <button id="noBtn">No 🙈</button>
-  </div>
-</div>
-
-<!-- SCREEN 5: YES -->
-<div class="container hidden" id="screen5">
-  <h1>I knew you would click YES 😘❤️</h1>
-  <div class="love-box">
-    <p id="shayari">
-      तिमी मेरो हाँसो हौ, तिमी नै मेरो सास,<br/>
-      तिमी बिना अधुरो लाग्छ, यो सारा आकाश।<br/>
-      माया तिमीमै अडिएको छ, आज र सधैं,<br/>
-      बस्छु म जिन्दगीभर तिम्रै भई ❤️
-    </p>
-  </div>
-  <div class="gifs">
-    <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif"/>
-    <img src="https://media.giphy.com/media/gnXG2hODaCOru/giphy.gif"/>
-    <img src="https://media.giphy.com/media/l2QDM9Jnim1YVILXa/giphy.gif"/>
-  </div>
-  <h2>Happy Valentine’s Day Love🌹❤️</h2>
-</div>
-
+  <section id="secret" class="screen">
+    <div class="emoji">💌</div>
+    <h1>Secret message unlocked</h1>
+    <p class="love">Whatever is stressing you right now,<br>
+    you don't have to solve everything today.<br><br>
+    Breathe. Drink some water. Smile for 5 seconds.<br>
+    And remember: <strong>you are loved more than you realise. ❤️</strong></p>
+    <button onclick="confetti()">Send me a smile 😊</button>
+    <p id="smile" class="message"></p>
+    <button class="alt" onclick="show('start')">Play again</button>
+  </section>
+</main>
 <script>
-const music = document.getElementById('bgMusic');
-const shayariMusic = document.getElementById('shayariMusic');
-const noBtn = document.getElementById('noBtn');
-
-const screen0 = document.getElementById('screen0');
-const screen1 = document.getElementById('screen1');
-const screen2 = document.getElementById('screen2');
-const screen3 = document.getElementById('screen3');
-const screen3_5 = document.getElementById('screen3_5');
-const screen4 = document.getElementById('screen4');
-const screen5 = document.getElementById('screen5');
-
-const basket = document.getElementById('basket');
-let gameInterval;
-
-// ===== START GAME =====
+const symbols=['💗','🌸','🦋','🍓','🌙','⭐'];
+let first=null, lock=false, found=0;
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
 function startGame(){
-  screen0.classList.add('hidden');
-  screen1.classList.remove('hidden');
-
-  document.addEventListener('mousemove', e=>{
-    let x = e.clientX - basket.offsetWidth/2;
-    if(x<0) x=0;
-    if(x>window.innerWidth-basket.offsetWidth) x=window.innerWidth-basket.offsetWidth;
-    basket.style.left = x+'px';
+  show('game'); first=null;lock=false;found=0;
+  const cards=[...symbols,...symbols].sort(()=>Math.random()-.5);
+  const grid=document.getElementById('grid');grid.innerHTML='';
+  cards.forEach((x,i)=>{
+    const b=document.createElement('button');b.className='tile';b.textContent='?';b.dataset.v=x;b.dataset.i=i;
+    b.onclick=()=>flip(b);grid.appendChild(b);
   });
-
-  gameInterval = setInterval(()=>{
-    const heart = document.createElement('div');
-    heart.classList.add('fall-heart');
-
-    const colors = ['💖','❤️','💛','💚','💙','🧡'];
-    const choice = colors[Math.floor(Math.random()*colors.length)];
-    heart.innerHTML = choice;
-    heart.dataset.color = choice;
-
-    heart.style.left = Math.random()*(window.innerWidth-50)+'px';
-    heart.style.top = '-50px';
-    document.body.appendChild(heart);
-
-    const fallSpeed = 8 + Math.random()*4;
-
-    const fall = setInterval(()=>{
-      let top = parseFloat(heart.style.top);
-      heart.style.top = top + fallSpeed + 'px';
-
-      const heartRect = heart.getBoundingClientRect();
-      const basketRect = basket.getBoundingClientRect();
-
-      if(!(heartRect.right < basketRect.left || heartRect.left > basketRect.right ||
-           heartRect.bottom < basketRect.top || heartRect.top > basketRect.bottom)){
-        if(heart.dataset.color==='💖'){
-          clearInterval(gameInterval);
-          document.querySelectorAll('.fall-heart').forEach(h=>h.remove());
-          screen1.classList.add('hidden');
-          screen2.classList.remove('hidden');
-        } else heart.remove();
-        clearInterval(fall);
-      }
-
-      if(top>window.innerHeight){
-        heart.remove();
-        clearInterval(fall);
-      }
-
-    }, 20);
-
-  }, 300);
+  update();
 }
-
-// ===== WIN SCREEN CONTINUE =====
-function welcomeScreen(){
-  screen2.classList.add('hidden');
-  screen3.classList.remove('hidden');
+function flip(b){
+  if(lock||b.classList.contains('matched')||b===first)return;
+  b.textContent=b.dataset.v;
+  if(!first){first=b;return}
+  if(first.dataset.v===b.dataset.v){
+    first.classList.add('matched');b.classList.add('matched');found++;first=null;update();
+    if(found===symbols.length)setTimeout(()=>show('win'),500);
+  }else{
+    lock=true;const a=first;first=null;
+    setTimeout(()=>{a.textContent='?';b.textContent='?';lock=false},650);
+  }
 }
-
-// ===== LOADING HEART AFTER WELCOME =====
-function loadingScreen(){
-  screen3.classList.add('hidden');
-  screen3_5.classList.remove('hidden');
-  setTimeout(()=>{
-    screen3_5.classList.add('hidden');
-    screen4.classList.remove('hidden');
-  }, 3200);
+function update(){document.getElementById('bar').style.width=(found/symbols.length*100)+'%'}
+function confetti(){
+  const el=document.getElementById('smile');el.textContent='Yesss! 😊 That smile was the whole point. 💕';
+  for(let i=0;i<18;i++){
+    const s=document.createElement('span');s.textContent=['💗','✨','🌸','💕'][i%4];
+    s.style.position='fixed';s.style.left=Math.random()*100+'vw';s.style.top='45vh';s.style.fontSize=(18+Math.random()*22)+'px';
+    s.style.transition='transform 1.2s, opacity 1.2s';document.body.appendChild(s);
+    requestAnimationFrame(()=>{s.style.transform=`translate(${(Math.random()-.5)*260}px,${-100-Math.random()*300}px) rotate(${Math.random()*360}deg)`;s.style.opacity='0'});
+    setTimeout(()=>s.remove(),1300);
+  }
 }
-
-// ===== VALENTINE SCREEN =====
-function valentineScreen(){
-  screen3.classList.add('hidden');
-  screen4.classList.remove('hidden');
-}
-
-// ===== YES SCREEN =====
-function sayYes(){
-  screen4.classList.add('hidden');
-  screen5.classList.remove('hidden');
-
-  // Play music
-  music.play();
-  shayariMusic.play();
-
-  // Animate shayari word by word
-  const el = document.getElementById('shayari');
-  const text = el.innerHTML;
-  const words = text.split(/(\s+|<br\/?>)/g);
-  el.innerHTML = "";
-  let i = 0;
-  const interval = setInterval(()=>{
-    if(i<words.length){
-      const span = document.createElement('span');
-      span.innerHTML = words[i];
-      span.style.opacity = 0;
-      span.style.transition = 'opacity 0.6s ease';
-      el.appendChild(span);
-      setTimeout(()=>{ span.style.opacity = 1; }, 50);
-      i++;
-    } else clearInterval(interval);
-  }, 200);
-}
-
-// ===== NO BUTTON =====
-function moveNo(){
-  noBtn.style.left = Math.random()*(window.innerWidth-100)+'px';
-  noBtn.style.top = Math.random()*(window.innerHeight-50)+'px';
-}
-noBtn.addEventListener('mouseover', moveNo);
-noBtn.addEventListener('click', moveNo);
-
-// ===== FLOATING ITEMS =====
-function createFloat(){
-  const el = document.createElement('div');
-  el.classList.add('float');
-  const r = Math.random();
-  if(r<0.4) el.innerHTML='❤️';
-  else if(r<0.7) el.innerHTML='🌹';
-  else el.innerHTML='🎈';
-  el.style.left = Math.random()*100+'vw';
-  el.style.fontSize = (24+Math.random()*20)+'px';
-  el.style.animationDuration = (6+Math.random()*6)+'s';
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),12000);
-}
-setInterval(createFloat,700);
-
 </script>
-
 </body>
 </html>
